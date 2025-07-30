@@ -1,0 +1,55 @@
+<%- include('partials/header', {title: 'Detail Request'}) %>
+
+<div class="px-3 py-3">
+    <div class="d-flex align-items-center mb-4">
+        <a href="/view-requests" class="btn btn-light me-3"><i class="bi bi-arrow-left"></i></a>
+        <div>
+            <h4 class="mb-0">Detail Request: <%= request.id %></h4>
+            <span class="badge 
+                <% if (request.status === 'request') { %>bg-primary<% } %>
+                <% if (request.status === 'checking') { %>bg-warning text-dark<% } %>
+                <% if (request.status === 'PO') { %>bg-info text-dark<% } %>
+                <% if (request.status === 'done') { %>bg-success<% } %>
+            "><%= request.status %></span>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <p class="mb-1"><strong class="text-muted">Proyek:</strong> <%= request.project %></p>
+            <p class="mb-0"><strong class="text-muted">Tanggal:</strong> <%= new Date(request.tanggal).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Material yang Di-request
+        </div>
+        <ul class="list-group list-group-flush">
+            <% materials.forEach(item => { %>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <%= item.material %>
+                    <span class="badge bg-secondary rounded-pill"><%= item.qty %> <%= item.satuan %></span>
+                </li>
+            <% }) %>
+        </ul>
+    </div>
+
+    <% if (canEditOrDelete) { %>
+        <div class="alert alert-info mt-3">
+            Request ini dibuat hari ini. Anda dapat mengedit atau menghapusnya.
+        </div>
+        <div class="d-grid gap-2 mt-3">
+            <form action="/delete-request/<%= encodeURIComponent(request.id) %>" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus request ini?');">
+                <button type="submit" class="btn btn-danger w-100">Hapus Request</button>
+            </form>
+        </div>
+    <% } else { %>
+        <div class="alert alert-secondary mt-3">
+            Request ini tidak dapat diubah atau dihapus karena sudah lewat hari.
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/bottom_nav') %>
+<%- include('partials/footer') %>

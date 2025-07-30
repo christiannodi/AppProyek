@@ -1,0 +1,84 @@
+<%- include('partials/header', {title: 'Request Material'}) %>
+
+<div class="px-3 py-3">
+    <div class="d-flex align-items-center mb-4">
+        <a href="/dashboard" class="btn btn-light me-3"><i class="bi bi-arrow-left"></i></a>
+        <h4 class="mb-0">Form Request Material</h4>
+    </div>
+
+    <form action="/request" method="POST">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="project" class="form-label">Pilih Proyek</label>
+                    <select class="form-select" id="project" name="project" required>
+                        <option value="" disabled selected>-- Pilih Proyek --</option>
+                        <% projects.forEach(p => { %>
+                            <option value="<%= p.namaProyek %>|<%= p.kodeProyek %>"><%= p.namaProyek %></option>
+                        <% }) %>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Daftar Material
+                <button type="button" class="btn btn-success btn-sm" id="add-material">
+                    <i class="bi bi-plus-circle"></i> Tambah Material
+                </button>
+            </div>
+            <div class="card-body" id="material-fields">
+                </div>
+        </div>
+        
+        <div class="d-grid mt-4">
+             <button type="submit" class="btn btn-primary btn-lg">Kirim Request</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('material-fields');
+        const addButton = document.getElementById('add-material');
+
+        function addMaterialField() {
+            const fieldIndex = container.children.length;
+            const newField = document.createElement('div');
+            newField.classList.add('row', 'g-2', 'align-items-center', 'mb-2', 'material-row');
+            newField.innerHTML = `
+                <div class="col-sm-5">
+                    <label class="form-label visually-hidden">Nama Material</label>
+                    <input type="text" class="form-control" name="material[]" placeholder="Nama Material" required>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label visually-hidden">Jumlah</label>
+                    <input type="number" class="form-control" name="qty[]" placeholder="Jumlah" required>
+                </div>
+                <div class="col-sm-3">
+                     <label class="form-label visually-hidden">Satuan</label>
+                    <input type="text" class="form-control" name="satuan[]" placeholder="Cth: Sak, Pcs" required>
+                </div>
+                <div class="col-sm-1 text-end">
+                    <button type="button" class="btn btn-danger btn-sm remove-material"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+            container.appendChild(newField);
+        }
+
+        addButton.addEventListener('click', addMaterialField);
+
+        container.addEventListener('click', function(e) {
+            if (e.target && (e.target.matches('.remove-material') || e.target.closest('.remove-material'))) {
+                e.target.closest('.material-row').remove();
+            }
+        });
+
+        // Tambahkan satu field material saat halaman dimuat
+        addMaterialField();
+    });
+</script>
+
+<%- include('partials/bottom_nav') %>
+<%- include('partials/footer') %>

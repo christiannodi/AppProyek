@@ -1,0 +1,61 @@
+<%- include('partials/header', {title: 'Login'}) %>
+
+<div class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="card shadow-sm" style="width: 100%; max-width: 400px;">
+        <div class="card-body p-4">
+            <h3 class="card-title text-center mb-4">Login Aplikasi Material</h3>
+            <% if (error == '1') { %>
+                <div class="alert alert-danger" role="alert">
+                    Username atau PIN salah!
+                </div>
+            <% } else if (error == '2') { %>
+                 <div class="alert alert-danger" role="alert">
+                    Gagal terhubung ke server. Coba lagi.
+                </div>
+            <% } %>
+            
+            <form action="/login" method="POST" id="loginForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">PIN</label>
+                    <input 
+                        type="password" 
+                        class="form-control" 
+                        id="password" 
+                        name="password" 
+                        required
+                        inputmode="numeric" /* Memunculkan keyboard angka di HP */
+                        pattern="[0-9]*"    /* Validasi sederhana untuk hanya angka */
+                    >
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+
+        // 1. Muat username saat halaman dibuka
+        const savedUsername = localStorage.getItem('savedUsername');
+        if (savedUsername) {
+            usernameInput.value = savedUsername;
+        }
+
+        // 2. Simpan username saat form disubmit
+        loginForm.addEventListener('submit', () => {
+            // Cek jika ada isinya, lalu simpan
+            if (usernameInput.value) {
+                localStorage.setItem('savedUsername', usernameInput.value);
+            }
+        });
+    });
+</script>
+
+<%- include('partials/footer') %>

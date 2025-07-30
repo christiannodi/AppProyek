@@ -1,0 +1,53 @@
+<%- include('partials/header', {title: 'Profil Saya'}) %>
+
+<div class="px-3 py-3">
+    <div class="d-flex align-items-center mb-4">
+        <a href="/dashboard" class="btn btn-light me-3"><i class="bi bi-arrow-left"></i></a>
+        <h4 class="mb-0">Profil Saya</h4>
+    </div>
+    
+    <% if (message) { %>
+        <div class="alert alert-success"><%= message %></div>
+    <% } %>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label text-muted">Nama Lengkap</label>
+                <p class="fs-5"><%= user.nama %></p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted">Username</label>
+                <p class="fs-5"><%= user.username %></p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted">Jabatan</label>
+                <p class="fs-5"><%= user.jabatan %></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Ubah PIN</h5>
+            <form action="/ubah-password" method="POST">
+                <div class="mb-3">
+                    <label for="new_password" class="form-label">PIN Baru</label>
+                    <input 
+                        type="password" 
+                        class="form-control" 
+                        id="new_password" 
+                        name="new_password" 
+                        required
+                        inputmode="numeric" /* Memunculkan keyboard angka di HP */
+                        pattern="[0-9]*"    /* Validasi sederhana untuk hanya angka */
+                    >
+                </div>
+                <button type="submit" class="btn btn-primary">Simpan PIN Baru</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/bottom_nav') %>
+<%- include('partials/footer') %>
