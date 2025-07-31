@@ -29,6 +29,9 @@
                         </small>
                     </div>
                     <p class="mb-1"><%= req.project %></p>
+                    <% if (user.role === 'superadmin') { %>
+                        <p class="mb-1 text-muted small"><i class="bi bi-person-fill"></i> Dibuat oleh: <%= req.user %></p>
+                    <% } %>
                     <small><%= new Date(req.tanggal).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></small>
                 </a>
             <% }) %>

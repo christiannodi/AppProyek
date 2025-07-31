@@ -17,6 +17,9 @@
     <div class="card mb-3">
         <div class="card-body">
             <p class="mb-1"><strong class="text-muted">Proyek:</strong> <%= request.project %></p>
+            <% if (user.role === 'superadmin') { %>
+                <p class="mb-1"><strong class="text-muted">Dibuat oleh:</strong> <%= request.user %></p>
+            <% } %>
             <p class="mb-0"><strong class="text-muted">Tanggal:</strong> <%= new Date(request.tanggal).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
         </div>
     </div>

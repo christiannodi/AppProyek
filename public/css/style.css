@@ -16,11 +16,18 @@ body {
     z-index: 1000;
 }
 
+.logo-center {
+    width: 100px;
+    display: block;
+    margin: 0 auto 20px auto;
+}
+
+
 .nav__link {
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #6c757d; /* Abu-abu Bootstrap */
+    color: #0d6efd; /* Abu-abu Bootstrap */
     text-decoration: none;
     transition: color 0.3s;
 }

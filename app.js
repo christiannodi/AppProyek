@@ -148,7 +148,7 @@ app.post('/ubah-password', authMiddleware, async (req, res) => {
 
 
 // Halaman Request Material
-app.get('/request', authMiddleware, roleCheck(['user']), async (req, res) => {
+app.get('/request', authMiddleware, roleCheck(['user', 'superadmin']), async (req, res) => {
     try {
         await doc.loadInfo();
         const projectsSheet = doc.sheetsByTitle['Proyek'];
@@ -163,7 +163,7 @@ app.get('/request', authMiddleware, roleCheck(['user']), async (req, res) => {
     }
 });
 
-app.post('/request', authMiddleware, roleCheck(['user']), async (req, res) => {
+app.post('/request', authMiddleware, roleCheck(['user', 'superadmin']), async (req, res) => {
     try {
         const { project, material, qty, satuan } = req.body;
         const [projectNama, projectKode] = project.split('|');
@@ -235,17 +235,24 @@ app.get('/view-requests', authMiddleware, async (req, res) => {
         const rows = await sheet.getRows();
         
         // Filter request berdasarkan user yang login
-        const userRequests = rows.filter(row => row.get('user') === req.session.user.username);
-        
+        let requestsToProcess;
+        // Jika superadmin, tampilkan semua. Jika tidak, filter berdasarkan user.
+        if (req.session.user.role === 'superadmin') {
+            requestsToProcess = rows;
+        } else {
+            requestsToProcess = rows.filter(row => row.get('user') === req.session.user.username);
+        }
+
         // Kelompokkan berdasarkan requestID
-        const groupedRequests = userRequests.reduce((acc, row) => {
+        const groupedRequests = requestsToProcess.reduce((acc, row) => {
             const id = row.get('requestID');
             if (!acc[id]) {
                 acc[id] = {
                     id: id,
                     tanggal: row.get('tanggal'),
                     status: row.get('status'),
-                    project: row.get('project')
+                    project: row.get('project'),
+                    user: row.get('user') // <-- Tambahkan user di sini
                 };
             }
             return acc;
@@ -268,14 +275,21 @@ app.get('/view-requests/:id', authMiddleware, async (req, res) => {
         const sheet = doc.sheetsByTitle['RequestOrder'];
         const rows = await sheet.getRows();
 
-        const requestDetails = rows.filter(row => row.get('requestID') === id && row.get('user') === req.session.user.username);
-        
+        const requestDetails = rows.filter(row => row.get('requestID') === id);
+
         if (requestDetails.length === 0) {
-            return res.status(404).send('Request tidak ditemukan atau Anda tidak memiliki akses.');
+            return res.status(404).send('Request tidak ditemukan.');
         }
-        
+
+        // Cek hak akses: user adalah pemilik ATAU user adalah superadmin
+        const requestOwner = requestDetails[0].get('user');
+        if (requestOwner !== req.session.user.username && req.session.user.role !== 'superadmin') {
+            return res.status(403).send('Akses ditolak. Anda tidak memiliki hak untuk melihat request ini.');
+        }
+
         const canEditOrDelete = requestDetails[0].get('tanggal') === getTodayDate();
 
+        // Kirim juga data user yang membuat request
         const materials = requestDetails.map(row => ({
             material: row.get('material'),
             qty: row.get('qty'),
@@ -290,6 +304,7 @@ app.get('/view-requests/:id', authMiddleware, async (req, res) => {
                 tanggal: requestDetails[0].get('tanggal'),
                 status: requestDetails[0].get('status'),
                 project: requestDetails[0].get('project'),
+                user: requestOwner // <-- Tambahkan user pembuat request
             },
             materials: materials,
             canEditOrDelete: canEditOrDelete
